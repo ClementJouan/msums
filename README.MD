@@ -11,3 +11,4 @@ Error if the number of seq = 0 or the number of sites = 0 implemented
 Print help if bad argument added
 Error message if no statistics are specified in the command line added
 Help for more precision added
+ 
