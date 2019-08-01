@@ -17,6 +17,9 @@ void write_stat_name(ostream & file, const string & name,
 		{
 		file << "_mean";
 		file << sep << name << "_std";
+		file << sep << name << "_skew";
+		file << sep << name << "_kurt";
+		/*file << sep << name << "_min";*/
 		}
 	}
 

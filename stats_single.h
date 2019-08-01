@@ -24,7 +24,7 @@ int n_segregating_sites(const SET_ITER & start, const SET_ITER & stop)
 	for (SET_ITER set = start; set != stop; set++)
 		if (set->n_alleles() > 1)
 			n++;
-
+	//cout << "segregating sites: " << n << "\n";
 	return n;
 	}
 
@@ -50,7 +50,7 @@ int count_singletons(const SET_ITER & start, const SET_ITER & stop)
 
 	for (SET_ITER set=start; set!=stop; set++)
 		count += set->n_singletons();
-
+	//cout << "singletons: " << count << "\n";
 	return count;
 	}
 
@@ -69,12 +69,14 @@ int count_singletons_for_seq(
 		if (s->is_singleton(*i))
 			count++;
 
+
 	return count;
 	}
 
 inline double theta_pi(int n_sequences, int sum_pair_diff)
 	{
 	return sum_pair_diff * 2.0 / (n_sequences * (n_sequences-1));
+
 	}
 
 

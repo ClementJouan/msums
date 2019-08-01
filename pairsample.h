@@ -14,7 +14,8 @@ public:
 
 protected:
 	const sample_t & _p1, & _p2;
-
+	mutable CachedValue<double> _norm;
+	mutable CachedValue<int> _mini;
 	mutable CachedValue<int> _spd;
 	mutable CachedValue<double> _fst;
 	mutable CachedValue<double> _patterson_D;
@@ -32,9 +33,31 @@ public:
 		{
 		if (_spd.ready())
 			return _spd;
-
 		int n_poly_sites = std::max(_p1.n_sites(), _p2.n_sites());
 		return _spd = sum_pair_diff(
+			_p1.alleles().begin(), _p1.alleles().begin() + n_poly_sites,
+			_p2.alleles().begin(), _p2.alleles().begin() + n_poly_sites);
+		}
+	
+	double sum_pairwise_differences_normalized() const
+		{
+		if (_norm.ready())
+			return _norm;
+		float n_pairs =  _p1.size() * _p2.size();
+		return _norm = sum_pairwise_differences()/n_pairs;
+		}
+
+
+
+
+
+	int sum_pairwise_mini() const
+		{
+		if (_mini.ready())
+			return _mini;
+
+		int n_poly_sites = std::max(_p1.n_sites(), _p2.n_sites());
+		return _mini = sum_pair_mini(
 			_p1.alleles().begin(), _p1.alleles().begin() + n_poly_sites,
 			_p2.alleles().begin(), _p2.alleles().begin() + n_poly_sites);
 		}
@@ -45,6 +68,7 @@ public:
 			return _fst;
 
 		const int n_pairs = _p1.size() * _p2.size();
+
 		const int count_pair_piT = 
 			_p1.size() * (_p1.size() - 1) / 2 + _p2.size() * (_p2.size() - 1) / 2 + 
 			n_pairs;
@@ -68,7 +92,8 @@ public:
 	// name?
 	double dn() const
 		{
-		return sum_pairwise_differences() - (_p1.theta_pi() + _p2.theta_pi())/2;
+		float n_pairs =  _p1.size() * _p2.size();
+		return sum_pairwise_differences_normalized() - ((_p1.theta_pi_s()/n_pairs) + (_p2.theta_pi_s()/n_pairs))/2;
 		}
 
 	const PolyL & poly_l() const

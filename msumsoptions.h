@@ -13,6 +13,7 @@ public:
 	string inputfilename;
 	string statfilename;
 	string maskfilename;
+	string maskefilename;
 	bool printPerLocus;
 
 	typedef OpList::Collector OLIter;
@@ -22,13 +23,14 @@ public:
 private:
 	bool printHelp;
 	bool listStats;
-	
+
 	OLIter keepS, dropS, keepP, dropP, groupSt;
 
 	OptionParser p;
 	UnaryOption<string> o_ifn;
 	UnaryOption<string> o_sfn;
 	UnaryOption<string> o_mfn;
+	UnaryOption<string> o_mfnp;
 	SwitchOption o_ppl;
 	SwitchOption o_hlp;
 	SwitchOption o_list;
@@ -37,17 +39,18 @@ private:
 	NaryOption<string, OLIter> o_dp;
 	NaryOption<string, OLIter> o_kp;
 	NaryOption<string, OLIter> o_ms;
-	
+
 public:
 	MSUMSOptions()
 		: inputfilename("spinput.txt"), statfilename("ABCstat.txt"),
 		maskfilename(""),
 		printPerLocus(false), printHelp(false), listStats(false),
-		keepS(statList, "+"), dropS(statList, "-"), 
+		keepS(statList, "+"), dropS(statList, "-"),
 		keepP(popList, "+"), dropP(popList, "-"),
-		groupSt(groupStatList), 
+		groupSt(groupStatList),
 		o_ifn(p, 'i', "init", inputfilename), o_sfn(p, 'o', "output", statfilename),
 		o_mfn(p, 'k', "mask", maskfilename),
+		o_mfnp(p, 'K', "mask", maskefilename),
 		o_ppl(p, 'l', "print_per_locus", printPerLocus),
 		o_hlp(p, 'h', "help", printHelp),
 		o_list(p, 'a', "list_stats", listStats),
@@ -58,16 +61,26 @@ public:
 
 	void do_print_help();
 	void do_list_stats();
-
 	void process(int argc, char * argv[])
 		{
 		try {
 		p.parse(argv+1, argc-1);
 		} catch (ArgException & e)
 			{
-			error(string("Error in main: unknown command line argument: ") +
-				e.what());
+			printf ("Error in main: unknown command line argument. See help: \n");
+			do_print_help();
+			exit (EXIT_FAILURE);
+
 			}
+
+
+			if (argv[4] == (statfilename)){
+				printf ("No stats specified, to compute all stats add : -S all \n example : msums -i spinput.txt -S all -o output.txt \n else, printHelp (msums -h) \n");
+    		exit (EXIT_FAILURE);
+			}
+
+
+
 
 		if (printHelp)
 			{

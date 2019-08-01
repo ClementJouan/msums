@@ -50,4 +50,5 @@ inline double D_est(int n1_a, int n2_a, int n1_b, int n2_b)
 	return (a-b)*(a-b) + h_a*(1 - 1.0/sa) + h_b*(1 - 1.0/sb);
 	}
 
+
 #endif	// PATTERSON_H

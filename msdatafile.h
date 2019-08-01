@@ -26,7 +26,7 @@ void read_dataset(istream & inp,
 	size_t dataset, 
 	const vector<vector<size_t> > & nSeq, const vector<size_t> & nSites, 
 	vector<vector<StrSample> > & seqhs, vector<Sequence> & seqOls,
-	const vector<vector<bool> > & mask = vector<vector<bool> > ());
+	const vector<vector<bool> > & mask = vector<vector<bool> > (), const vector<vector<bool> > & maske = vector<vector<bool> > ());
 
 
 #endif	// MSDATAFILE_H

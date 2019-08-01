@@ -2,14 +2,15 @@
 #include <boost/lexical_cast.hpp>
 
 #include "msdatafile.h"
+#include "msumsoptions.h"
 #include "sputil.h"
-
+#include<fstream>
 using namespace std;
 
 typedef SPIOException SPIOE;
 
 
-/** Reads datasetfile and extracts DNA sequences from all population and 
+/** Reads datasetfile and extracts DNA sequences from all population and
 	the outgroup.
 	@param inp file to read data from.
 	@param dataset number of current data set.
@@ -19,15 +20,15 @@ typedef SPIOException SPIOE;
 	@param outgroup outgroup data[locus].
 	@param mask missing data bool[locus][site].
 	*/
-void read_dataset(istream & inp, size_t dataset, 
-	const vector<vector<size_t> > & n_sequences, const vector<size_t> & n_sites, 
+void read_dataset(istream & inp, size_t dataset,
+	const vector<vector<size_t> > & n_sequences, const vector<size_t> & n_sites,
 	vector<vector<StrSample> > & sequences, vector<Sequence> & outgroups,
-	const vector<vector<bool> > & mask )
+	const vector<vector<bool> > & mask, const vector<vector<bool> > & maske )
 	{
 	size_t nseg;
 
 	const string match_segsites = "segsites:";
-
+	
 	vector<int> positions;
 
 	string str;
@@ -36,9 +37,13 @@ void read_dataset(istream & inp, size_t dataset,
 	const size_t n_pops = n_sequences.size();
 	const size_t n_loci = n_sites.size();
 
+
+
 	// loop over all loci
 	for (size_t l=0; l<n_loci; l++)
 		{
+
+
 		istringstream itmp;
 		string stmp;
 		// skip all lines that don't start with 'segsites:'
@@ -63,16 +68,16 @@ void read_dataset(istream & inp, size_t dataset,
 		itmp >> nseg;
 
 		if (itmp.fail())
-			throw SPIOE(string(ERR_LOC " Error in reading dataset ") + 
-				lexical_cast<string>(dataset) + " at locus " + 
+			throw SPIOE(string(ERR_LOC " Error in reading dataset ") +
+				lexical_cast<string>(dataset) + " at locus " +
 				lexical_cast<string>(l) +  ": couldn't read number of seg sites ");
 
-		if (nseg > n_sites[l]) 
+		if (nseg > n_sites[l])
 			{	/*if too many segregating sites*/
 			nseg = n_sites[l];
 			// TODO: ask Ludovic whether error message in this case
-			//errorfile << "\nerror in reading dataset: nseg=" << nseg 
-			//	<< " > total number of sites=" << n_sites[l] 
+			//errorfile << "\nerror in reading dataset: nseg=" << nseg
+			//	<< " > total number of sites=" << n_sites[l]
 			//	<< " in locus " << l;
 			}
 
@@ -81,7 +86,7 @@ void read_dataset(istream & inp, size_t dataset,
 			{
 			positions.clear();
 			positions.resize(nseg);
-			
+
 			itmp.clear();
 			itmp.str(str);
 			// throw away first part of line
@@ -95,11 +100,43 @@ void read_dataset(istream & inp, size_t dataset,
 				positions[s] = lround(p * mask[l].size());
 				}
 			}
+		if (maske.size())	// we need position info
+			{
+			positions.clear();
+			positions.resize(nseg);
 
+			itmp.clear();
+			itmp.str(str);
+			// throw away first part of line
+			stmp = "";
+			itmp >> stmp;
+
+			float p;
+			for (size_t s=0; s<nseg; s++)
+				{
+				itmp >> p;
+				positions[s] = lround(p * maske[l].size());
+				}
+			}
 		// for all population
 		for (size_t p=0; p<n_pops; p++)
 			{
-			sequences[p][l].set_tot_n_sites(n_sites[l]);
+			if (mask.size()){
+				//compute the number of hiddensites per locus
+				int hiddensites = 0;
+				for (int w=0; w<mask[l].size(); w++){
+					if (mask[l][w] == 1){
+						hiddensites += 1;
+						}
+					}
+			sequences[p][l].set_tot_n_sites(n_sites[l] - hiddensites);
+				}
+				
+			else{
+				sequences[p][l].set_tot_n_sites(n_sites[l]);
+				}
+		//cout << hiddensites << "\n";
+
 
 			// all sequences of population p
 			for (size_t h=0; h<n_sequences[p][l]; h++) 
@@ -119,16 +156,21 @@ void read_dataset(istream & inp, size_t dataset,
 
 				Sequence & seq = sequences[p][l].sequence(h);
 				seq.clear(); seq.reserve(nseg);
-				if (mask.size())
+				if (maske.size())
 					{
-					for (size_t i=0; i<str.size(); i++)
-						// only add non-masked sites
+					for (size_t i=0; i<str.size(); i++){
+						// only add masked sites
+						//cout << "l: " << l << " " << "h: " << h << " " << "i: " << i << " " << "sizestr: " << str.size() << "\n";				
+						cout << "im open" << "\n";
 						if (mask[l][positions[i]] == 0)
 							seq.push_back(int(str[i]) - int('0'));
+						}
 					}
+
 				else
 					for (size_t i=0; i<str.size(); i++)
 						{
+						//cout << "l: " << l << " " << "h: " << h << " " << "i: " << i << " " << "sizestr: " << str.size() << "\n";
 						if (str[i] != '0' && str[i] != '1')
 							cerr << "unexpected input: " << str[i] << std::endl;
 						seq.push_back(int(str[i]) - int('0'));

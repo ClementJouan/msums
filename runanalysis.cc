@@ -95,7 +95,7 @@ void analyse_aggr(ostream & abcstatfile, int dataset,
 				}
 
 			aggregate.analyse();
-			abcstatfile << '\t' << aggregate.mean() << '\t'<< aggregate.std();
+			abcstatfile << '\t' << aggregate.mean() << '\t'<< aggregate.std() << '\t'<< aggregate.skew() << '\t'<< aggregate.kurt();
 			}
 		}
 
@@ -127,7 +127,7 @@ void analyse_aggr(ostream & abcstatfile, int dataset,
 				{
 				aggregates[stat].analyse();
 				abcstatfile << '\t' << aggregates[stat].mean() <<
-				   	'\t' << aggregates[stat].std();
+				   	'\t' << aggregates[stat].std() << '\t'<< aggregates[stat].skew() << '\t'<< aggregates[stat].kurt();
 				}
 			}
 
@@ -158,6 +158,6 @@ void analyse_aggr(ostream & abcstatfile, int dataset,
 			}
 
 		aggregate.analyse();
-		abcstatfile << '\t' << aggregate.mean() << '\t'<< aggregate.std();
+		abcstatfile << '\t' << aggregate.mean() << '\t'<< aggregate.std() << '\t'<< aggregate.skew() << '\t'<< aggregate.kurt();
 		}
 	}

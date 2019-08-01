@@ -11,6 +11,7 @@
 #include "pairsample.h"
 #include "anafunctors.h"
 #include "groupana.h"
+#include "RNDmin.h"
 
 using namespace std;
 
@@ -116,6 +117,10 @@ public:
 			ana = new PatF4<SAMPLEV>();
 		else if (name == "var")
 			ana = new FreqVarying<SAMPLEV>();
+		else if (name == "rndmin")
+			ana = new RNDmin<SAMPLEV>();
+		else if (name == "rndminO")
+			ana = new RNDminO<SAMPLEV>();
 
 		VERIFY_MSG(ana, string("Error: unknown stat name '" + name + "'"));
 

@@ -40,11 +40,11 @@ struct Aggregate
 	{
 protected:
 	size_t _n;
-	double _mean, _sqr_sum, _std;
+	double _mean, _sqr_sum, _std, _skew_sum, _kurt_sum, _skew, _kurt;
 
 public:
 	Aggregate()
-		: _n(0), _mean(0), _sqr_sum(0), _std(0)
+		: _n(0), _mean(0), _sqr_sum(0), _std(0), _skew_sum(0), _kurt_sum(0)
 		{}
 
 	void operator()(double value)
@@ -55,6 +55,12 @@ public:
 		_n++;
 		_mean += value;
 		_sqr_sum += value * value;
+		//_skew_sum += pow(value,3);
+		_kurt_sum += pow((value - _mean),4);
+
+
+		_skew_sum += pow((value - _mean),3);
+
 		}
 
 	void analyse()
@@ -63,15 +69,25 @@ public:
 			return;
 		
 		const double ssq = _sqr_sum - _mean*_mean/_n;
-		_std = sqrt(ssq / (_n-1));
 
+
+		_std = sqrt(ssq / (_n-1));
+		
 		_mean /= _n;
+		_skew = _skew_sum / _n;
+
+		_kurt = (_kurt_sum / _n) - 3;
+
 		}
 
 	double mean() const
 		{ return _mean; }
 	double std() const
 		{ return _std; }
+	double skew() const
+		{ return _skew; }
+	double kurt() const
+		{ return _kurt; }
 	};
 
 

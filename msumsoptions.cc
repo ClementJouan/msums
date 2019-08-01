@@ -9,26 +9,37 @@ using namespace std;
 void MSUMSOptions::do_print_help()
 	{
 	cout <<
-	"msums [-i FILE] [-o FILE] [-h] [-l] [[-s|-S STATLIST]...] "
+	"msums [-i FILE] [-k | -K FILE] [-o FILE] [-h] [-l] [[-s|-S STATLIST]...] "
 	"[[-p|-P POPLIST]...]\n\n";
+	cout <<
+	"Example of a command line: \n"
+	"msums -i my_input.txt -k my_mask.txt -S all -o my_stats.txt\n\n";
 	cout <<
 	"-i, --init FILE       Use this initialization file. [spinput.txt]\n"
 	"-o, --output FILE     Use this output file. [ABCstat.txt]\n"
-	"-k, --mask FILE       Load (and use) mask file []\n"
+	"-k, --mask FILE       Load (and use) mask file [], statistics are standardized by \n"
+	"		       the number of unmasked sites rather than by the locus length. \n"
+	"-K, --mask FILE       Load (and use) mask file [], statistics are computed \n"
+	"		       by the locus length. \n"
 	"-h, --help            Print the help text and exit.\n"
 	"-a, --list_stats      Print list of available stats and exit.\n"
-	"-l, --print_per_locus Print stats per locus, don't print aggregate values.\n"
+	"-l, --print_per_locus Compute stats per locus, don't compute aggregate values.\n"
 	"                      [false]\n"
-	"-S, --keepStats LIST  Print stats in LIST. LIST is a space-separated list of\n"
+	"-S, --keepStats LIST  Compute stats in LIST. LIST is a space-separated list of\n"
 	"                      stat names. 'all' selects all stats.\n"
-	"-s, --dropStats LIST  Do *not* print stats in LIST (see above).\n"
-	"-P, --keepPops LIST   Show populations or pairs in LIST. Populations can be\n"
+	"-s, --dropStats LIST  Do *not* compute stats in LIST (see above).\n"
+	"-P, --keepPops LIST   Compute populations or pairs in LIST. Populations can be\n"
 	"                      specified as single number (e.g. '2'), or range \n"
 	"                      (e.g. '1-5'). Pairs are specifies as p1xp2 (e.g. '1x2').\n"
 	"                      'all' selects all populations, 'allxall' all pairs.\n"
-	"-p, --dropPops LIST   Do *not* show populations/pairs in LIST (see above).\n"
-	"-m, --multiStats LIST Show multi-population statistics in LIST. Use e.g. as:\n"
-	"                      -m f4 1x4x5x6 -m var\n";
+	"-p, --dropPops LIST   Do *not* compute populations/pairs in LIST (see above).\n"
+	"-m, --multiStats LIST Compute multi-population statistics in LIST. Use e.g. as:\n"
+	"		       -m f3 0x1x2 -m var\n "
+	"		       -m f4 1x4x5x6 \n "
+	"                      -m rndmin 0x2x1 with 1 being the outgroup. \n "
+	"                      -m rndminO 0x2xn with n being any number. It computes RNDmin with \n"
+	"		       an outgroup corresponding to a pseudo-ancestral sequence (a succession of 0). \n "
+	"		       /!\\ Numbers represent populations in range 0...n. \n ";
 	}
 
 void MSUMSOptions::do_list_stats()
@@ -54,7 +65,10 @@ void MSUMSOptions::do_list_stats()
     "pairdif         sum of pairwise allele difference.\n"
     "segr            number of segregating sites (i.e. SNPs) per locus.\n"
     "singlet         overall number of singleton alleles (across all sites).\n"
-    "thpi            Tajima's Theta, i.e. nucleotide diversity.\n"
+    "thpi            Tajima's Theta, i.e. nucleotide diversity. \n"
+    "		     Normalized by the locus length.\n"
+    "thpi_seg        Tajima's Theta, i.e. nucleotide diversity. \n"
+    "		     Normalized by the number of segsites.\n"
     "thW             Watterson Theta.\n"
     "flDstar         Fu & Li’s D*.\n"
     "flFstar         Fu & Li’s F*.\n"
@@ -110,8 +124,19 @@ void MSUMSOptions::do_list_stats()
     "                    [to be detailed]\n"
     "Wx1s2_ixj       see Navascues et al. BMC Evol. Biol. 2014.\n"
     "                    [to be detailed]\n"
-    "pattD_ixj       Patterson's D statistic used in the 'ABBA-BABA' test\n"
+ 
+    "#### Multi-population statistics (more than two populations).\n"
+    "     Those are Patterson's test described in Patterson et al. Genetics 2012.\n"
+    "pattf3          \n"
+    "                    [to be detailed]\n"
+    "pattf4        \n"
+    "                    [to be detailed]\n"
+    "pattDixj_    \n"
+    "                    Patterson's D statistic used in the 'ABBA-BABA' test\n"
     "                    (Patterson et al. Genetics 2012).\n"
-    "                    [How it is implemented, does it not need 4 pops?\n"
-    "                    Is it F2 maybe?]\n";
+    "RNDmin    \n"
+    "                    see Rosenzweig et al. Mol Ecol. 2016 Jun; 25(11): 2387-2397. \n"
+    "			 RNDmin = dmin / out \n "
+    "			 with dmin = min(d_ixj) and dout = (d_ixO + d_jxO)/2 \n"
+    "			 O being the outgroup. \n ";
 	}

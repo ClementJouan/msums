@@ -60,7 +60,6 @@ public:
 		{
 		for (size_t i=_data.size(); i<=n; i++)
 			_data.push_back(_op(_data.back(), i));
-		
 		return _data[n];
 		}
 	};

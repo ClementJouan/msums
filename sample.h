@@ -34,7 +34,7 @@ protected:
 	typedef CachedValue<double> CVD;
 	typedef CachedValue<int> CVI;
 
-	mutable CVI _spwd, _nss, _nst;
+	mutable CVI _spwd, _nss, _nst, _segr;
 	mutable CVD _theta_pi, _theta_W, _flD, _flF, _tajD, _R2;
 	mutable CachedValue<vector<int> > _nstps;
 
@@ -128,10 +128,13 @@ public:
 		// now count alleles
 		for (size_t s=0; s<_alleles.size(); s++)
 			_alleles[s].do_count();
+			
+
 		}
 
 	bool n_alleles(size_t site) const
-		{ return _alleles[site].count(); }
+		{ 
+		return _alleles[site].count(); }
 
 	const allele_set & alleles(size_t site) const
 		{ return _alleles[site]; }
@@ -147,6 +150,7 @@ public:
 				_alleles.begin(), _alleles.end()));
 		}
 
+
 	int n_segregating_sites() const
 		{
 		return CACHED_OR_COMPUTE(_nss, ::n_segregating_sites(
@@ -158,6 +162,13 @@ public:
 		return CACHED_OR_COMPUTE(_nst, count_singletons(
 				_alleles.begin(), _alleles.end()));
 		}
+
+	int segr() const
+		{
+		return CACHED_OR_COMPUTE(_spwd, pairwise_differences(
+				_alleles.begin(), _alleles.end()));
+		}
+
 
 	const vector<int> & n_singletons_by_seq() const
 		{
@@ -177,8 +188,16 @@ public:
 
 	double theta_pi_s() const
 		{
+		//cout << _tot_n_sites << "\n";
 		return theta_pi() / _tot_n_sites;
 		}
+
+	double theta_pi_segsites() const
+		{
+		return theta_pi() / n_segregating_sites();
+		}
+
+
 
 	double theta_pi() const
 		{

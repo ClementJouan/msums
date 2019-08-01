@@ -70,12 +70,23 @@ void ConfigFile::dump(ostream & out)
 	out << "\n\tnumber of loci: " << nLoci;
 	for(size_t l=0;l<nLoci;l++)	/*loop over loci*/
 		{
-		for (size_t p=0; p<_n_sequences.size(); p++)
+		for (size_t p=0; p<_n_sequences.size(); p++){
+			if (_n_sequences[p][l] == 0){
+				throw SPIOE(ERR_LOC
+					"Error, number of sequence cannot be 0 at locus " + lexical_cast<string>(l));
+			}
+
 			out << "\n\tnumber of sequences in population " << p << 
 				" at locus " << l << ":" << _n_sequences[p][l];
+		}
 
+		if (_n_sites[l] == 0){
+			throw SPIOE(ERR_LOC
+				"Error, number of sites cannot be 0 at locus " + lexical_cast<string>(l));
 		out << "\n\t\tnumber of sites at locus " << l << ": " << _n_sites[l];
 		}
+		//cout << _n_sites[l] << "\n";
+	}
 
 	out << "\n\tnumber of replicate datasets: " << _n_datasets; 
 	out << "\n\tname of the dataset file: " << _datafilename;

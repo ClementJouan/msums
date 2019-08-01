@@ -12,11 +12,13 @@ SSHandler::SSHandler()
 	add("segr", SI::create<&sample_t::n_segregating_sites>());
 	add("singlet", SI::create<&sample_t::n_singletons>());
 	add("thpi", SD::create<&sample_t::theta_pi_s>());
+	add("thpi_seg", SD::create<&sample_t::theta_pi_segsites>());
 	add("thW", SD::create<&sample_t::theta_W_s>());
 	add("flDstar", SD::create<&sample_t::fu_li_Dstar>());
 	add("flFstar", SD::create<&sample_t::fu_li_Fstar>());
 	add("tD", SD::create<&sample_t::tajima_D>());
 	add("R2", SD::create<&sample_t::R2>());
+	
 	}
 
 PSHandler::PSHandler()
@@ -26,8 +28,9 @@ PSHandler::PSHandler()
 	typedef AnalysisWrapper<sample_t, double> SD;
 	typedef AnalysisWrapper<sample_t, int> SI;
 
-	add("d", SI::create<&sample_t::sum_pairwise_differences>());
+	add("d", SD::create<&sample_t::sum_pairwise_differences_normalized>());
 	add("dn", SD::create<&sample_t::dn>());
+	add("Dmin", SI::create<&sample_t::sum_pairwise_mini>());
 	add("FST", SD::create<&sample_t::fst>());
 	add("bialsites", SI::create<&sample_t::n_bial_sites>());
 	add("multisites", SI::create<&sample_t::n_multi_sites>());
